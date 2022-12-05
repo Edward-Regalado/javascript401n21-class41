@@ -1,94 +1,77 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, ActivityIndicator, SafeAreaView, ScrollView, FlatList, Alert, RefreshControl, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Image, ActivityIndicator, SafeAreaView, ScrollView, FlatList, Alert, RefreshControl, KeyboardAvoidingView, ImageBackground, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import { StatusBar } from 'expo-status-bar';
 
-
 import getImageForWeather from '../utils/getImageForWeather';
 import getIconForWeather from '../utils/getIconForWeather';
-// import image from '../assets/clear.png';
 
-// import { openWeatherKey } from './Secrets';
-// const openWeatherKey = '878a5089e2df0b4c044936a92104191e';
-const openWeatherKey = '02e36843da79d4838d1a02a8e15b8c9a';
-let url = `https://api.openweathermap.org/data/2.5/onecall?&units=metric&exclude=minutely&appid=${openWeatherKey}`;
+import { OPEN_WEATHER_API } from '@env';
 
 
 function Weather(){
 
-//   const [forecast, setForecast] = useState(null);
-//   const [refreshing, setRefreshing] = useState(false);
-  const [weather, setWeather] = useState('Clear');
+  const [forecast, setForecast] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [weather, setWeather] = useState('');
+  // const [weather, setWeather] = useState('Clear');
+  // const [weather, setWeather] = useState('Snow');
+  // const [weather, setWeather] = useState('Rain');
+  // const [weather, setWeather] = useState('Drizzle');
+  // const [weather, setWeather] = useState('Snow');
+  // const [weather, setWeather] = useState('Clouds');
 
-//   const loadForecast = async () => {
-//     setRefreshing(true);
+  const loadForecast = async () => {
+    setRefreshing(true);
 
-//     // const { status } = await Location.requestPermissionsAsync();
-//     const { status } = await Location.requestForegroundPermissionsAsync();
-//     if (status !== 'granted') {
-//       Alert.alert('Permission to access location was denied');
-//     }
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission to access location was denied');
+    }
 
-//     let location = await Location.getCurrentPositionAsync({enableHighAccuracy: true});
+    let location = await Location.getCurrentPositionAsync({enableHighAccuracy: true});
 
-//     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=536fc8624c2e6499524501c02319057d&units=imperial`)
-//     const data = await response.json();
+    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=${OPEN_WEATHER_API}&units=imperial`);
 
-//     if(!response.ok) {
-//       Alert.alert(`Error retrieving weather data: ${data.message}`); 
-//     } else {
-//       setForecast(data);
-//         setWeather(data.weather[0].main);
-//     }
+    const data = await response.json();
 
-//     setRefreshing(false);
-//   }
+    if(!response.ok) {
+      Alert.alert(`Error retrieving weather data: ${data.message}`); 
+    } else {
+      setForecast(data);
+        setWeather(data.weather[0].main);
+    }
 
-//   useEffect(() => { 
-//     if (!forecast) {
-//       loadForecast(); 
-//     }
-//   })
+    setRefreshing(false);
+  }
 
-//   if (!forecast) {
-//     return <SafeAreaView style={styles.loading}>
-//       <ActivityIndicator size="large" />
-//       </SafeAreaView>;
-//   }
+  useEffect(() => { 
+    if (!forecast) {
+      loadForecast(); 
+    }
+  })
 
-//   const current = forecast.weather[0];
+  if (!forecast) {
+    return <SafeAreaView style={styles.loading}>
+      <ActivityIndicator size="large" />
+      </SafeAreaView>;
+  }
+
+  const current = forecast.weather[0];
   
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
-      {/* <ScrollView 
-        refreshControl={
-          <RefreshControl 
-            onRefresh={() => {  loadForecast() }} 
-            refreshing={refreshing}
-          />}
-      > */}
       <ImageBackground source={getImageForWeather(weather)} style={styles.imageContainer} imageStyle={styles.image}>
-
-      <StatusBar style={styles.status} animated={true} barStyle='light-content'/>
-        <Text style={styles.title}>White Center</Text>
-        <View style={styles.current}>
-          {/* <Image
-            style={styles.largeIcon}
-            source={{
-                uri: `http://openweathermap.org/img/wn/${current.icon}@4x.png`,
-            }}
-        /> */}
-          {/* <Text style={styles.currentTemp}>{Math.round(forecast.main.temp)}°F</Text> */}
-          <Text style={[styles.largeText, styles.textStyle]}>{getIconForWeather(weather)}</Text>
-          <Text style={[styles.currentTemp, styles.textStyle]}>38 °F</Text>
-          {/* <Text style={[styles.currentDescription, styles.textStyle]}>Main: Clouds</Text> */}
-          {/* <Text style={[styles.currentDescription, styles.textStyle]}>Overcast clouds</Text> */}
-          {/* <Text>{forecast.name}</Text> */}
+        <StatusBar style={styles.status} animated={true} barStyle='light-content'/>
+        <View style={styles.currentContainer}>
+          <View style={styles.currentTempContainer}>
+            <Text style={styles.title}>{forecast.name}</Text>
+            <Text style={[styles.largeIcon, styles.textStyle]}>{getIconForWeather(weather)}</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>{Math.round(forecast.main.temp)}F</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>{current.main}</Text>
+          </View>
         </View>
-        
-        {/* <Text style={styles.currentDescription}>{current.description}</Text> */}
-      {/* </ScrollView> */}
-        </ImageBackground>
+      </ImageBackground>
     </KeyboardAvoidingView>
   );
 }
@@ -105,9 +88,10 @@ const styles = StyleSheet.create({
   title: {
     width: '100%',
     textAlign: 'center',
-    fontSize: 30,
-    color: '#02111B',
-    marginTop: 30,
+    fontSize: 36,
+    // color: '#02111B',
+    color: 'white',
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 24,
@@ -121,10 +105,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  current: {
+  currentContainer: {
+    backgroundColor: 'rgba(52, 52, 52, 0.4)',
     flexDirection: 'column',
     alignItems: 'center',
     alignContent: 'center',
+    borderWidth: 2,
+    borderRadius: 10,
+    width: 300,
+  },
+  currentTempContainer: {
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'center',
   },
   currentTemp: {
     fontSize: 32,
@@ -158,8 +151,8 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   largeIcon: {
-    width: 250,
-    height: 200,
+    fontSize: 50,
+    marginBottom: 10,
   },
   smallIcon: {
     width: 100,
@@ -179,6 +172,7 @@ const styles = StyleSheet.create({
   textStyle: {
     textAlign: 'center',
     fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto',
+    color: 'white',
   },
   largeText: {
     fontSize: 44,
