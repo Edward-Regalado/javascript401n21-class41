@@ -1,6 +1,17 @@
 # LAB - React Native - Milestone 1: MVP
 
-- Create your first native phone/device application using React Native, tapping into at least 2 phone features
+- Create your first native phone/device application using React Native, tapping into at least 2 phone features 
+
+## Setup
+
+- `git clone git@github.com:Edward-Regalado/javascript401n21-class41.git`
+- `npx i` to install dependencies
+- `npx expo start` & follow directions in terminal
+
+## Environment Variables
+
+- add `.env` file
+- inside `.env` file, add `OPEN_WEATHER_API` = your api key
 
 ## Assignment
 
