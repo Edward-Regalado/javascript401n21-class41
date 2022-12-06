@@ -1,75 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, ActivityIndicator, SafeAreaView, ScrollView, FlatList, Alert, RefreshControl, KeyboardAvoidingView, ImageBackground, Platform } from 'react-native';
-import * as Location from 'expo-location';
+// components
+import { StyleSheet, Text, View, Image, ActivityIndicator, SafeAreaView, ScrollView, FlatList, Alert, RefreshControl, KeyboardAvoidingView, ImageBackground, Platform, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
+// navigation
+// import { NavigationContainer } from '@react-navigation/native';
+// import { createNativeStackNavigator } from '@react-navigation/native-stack';
+// location
+import * as Location from 'expo-location';
+// import images and icon
 import getImageForWeather from '../utils/getImageForWeather';
 import getIconForWeather from '../utils/getIconForWeather';
+// api key
 
 import { OPEN_WEATHER_API } from '@env';
 
 
-function Weather(){
 
-  const [forecast, setForecast] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [weather, setWeather] = useState('');
-  // const [weather, setWeather] = useState('Clear');
-  // const [weather, setWeather] = useState('Snow');
-  // const [weather, setWeather] = useState('Rain');
-  // const [weather, setWeather] = useState('Drizzle');
-  // const [weather, setWeather] = useState('Snow');
-  // const [weather, setWeather] = useState('Clouds');
+function Home(props){
 
-  const loadForecast = async () => {
-    setRefreshing(true);
-
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission to access location was denied');
-    }
-
-    let location = await Location.getCurrentPositionAsync({enableHighAccuracy: true});
-
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=${OPEN_WEATHER_API}&units=imperial`);
-
-    const data = await response.json();
-
-    if(!response.ok) {
-      Alert.alert(`Error retrieving weather data: ${data.message}`); 
-    } else {
-      setForecast(data);
-        setWeather(data.weather[0].main);
-    }
-
-    setRefreshing(false);
-  }
-
-  useEffect(() => { 
-    if (!forecast) {
-      loadForecast(); 
-    }
-  })
-
-  if (!forecast) {
-    return <SafeAreaView style={styles.loading}>
-      <ActivityIndicator size="large" />
-      </SafeAreaView>;
-  }
-
-  const current = forecast.weather[0];
+  // const current = props.route.params.forecast.weather[0];
   
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
-      <ImageBackground source={getImageForWeather(weather)} style={styles.imageContainer} imageStyle={styles.image}>
+      <ImageBackground source={getImageForWeather(props.route.params.weather)} style={styles.imageContainer} imageStyle={styles.image}>
         <StatusBar style={styles.status} animated={true} barStyle='light-content'/>
         <View style={styles.currentContainer}>
           <View style={styles.currentTempContainer}>
-            <Text style={styles.title}>{forecast.name}</Text>
+            <Text style={styles.title}>Seattle</Text>
+            <Text style={[styles.largeIcon, styles.textStyle]}>{getIconForWeather(props.route.params.weather)}</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>38 F</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>Rain</Text>
+            {/* <Text style={styles.title}>{forecast.name}</Text>
             <Text style={[styles.largeIcon, styles.textStyle]}>{getIconForWeather(weather)}</Text>
             <Text style={[styles.currentTemp, styles.textStyle]}>{Math.round(forecast.main.temp)}F</Text>
-            <Text style={[styles.currentTemp, styles.textStyle]}>{current.main}</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>{current.main}</Text> */}
           </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Weather Details"
+              onPress={() => props.navigation.navigate('Details')}
+              />
+          </View>
+          {/* <Text style={styles.title}>{props.route.params.weather}</Text> */}
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>
@@ -176,7 +149,13 @@ const styles = StyleSheet.create({
   },
   largeText: {
     fontSize: 44,
+  },
+  buttonContainer: {
+    margin: 20
+  },
+  go: {
+    borderRadius: 30,
   }
 });
 
-export default Weather;
+export default Home;
