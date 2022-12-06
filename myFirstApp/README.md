@@ -53,3 +53,6 @@ As you complete your RNA, switch your focus to the user experience.
 - Dark and Light Modes
 - Well thought through UX
 - Be considerate of individuals that primarily use their thumbs, left or right hands
+
+![Screen 1](./assets/screen1.PNG)  
+![Screen 2](./assets/screen2.PNG)  

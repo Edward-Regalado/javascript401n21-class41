@@ -4,28 +4,32 @@ import { StyleSheet, View, Button, Text, KeyboardAvoidingView, ImageBackground, 
 import { StatusBar } from 'expo-status-bar';
 import getImageForWeather from '../utils/getImageForWeather';
 
-import image from '../utils/getImageForWeather';
-import getIconForWeather from '../utils/getIconForWeather';
+import getImage from '../utils/getImageForWeather';
 import getIcon from '../utils/getIconForWeather';
 
 function Details(props) {
 
     return (
-    <KeyboardAvoidingView styles={styles.container} behavior='padding'>
-        <ImageBackground source={image(props.route.params.weather)} style={styles.imageContainer} imageStyle={styles.image}>
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+        <ImageBackground source={getImage(props.route.params.weather)} style={styles.imageContainer} imageStyle={styles.image}>
             <StatusBar style={styles.status} animated={true} barStyle='light-content' />
             <View style={styles.container}>
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.title}>Seattle</Text>
+                    <Text style={styles.title}>{props.route.params.forecast.name}</Text>
                     <Text style={[styles.largeIcon, styles.textStyle]}>{getIcon(props.route.params.weather)}</Text>
-                    <Text style={[styles.currentTemp, styles.textStyle]}>38 F</Text>
-                    <Text style={[styles.currentTemp, styles.textStyle]}>Feels like: 36</Text>
-                    <Text styles={[styles.currentTemp, styles.textStyle]}>Humidity</Text>
-                    <Text styles={[styles.currentTemp, styles.textStyle]}>Wind Speed</Text>
-                    <Text styles={[styles.currentTemp, styles.textStyle]}>Direction Deg</Text>
+
+                    <Text style={[styles.currentTemp, styles.textStyle]}>{Math.round(props.route.params.forecast.main.temp)}&deg;F</Text>
+                    <View style={styles.minMaxContainer}>
+                        <Text style={[styles.minMaxText, styles.textStyle]}>Min {Math.round(props.route.params.forecast.main.temp_min)}&deg;F</Text>
+                        <Text style={[styles.minMaxText, styles.textStyle]}>Max {Math.round(props.route.params.forecast.main.temp_max)}&deg;F</Text>
+                    </View>
+                    <Text style={[styles.minMaxText, styles.textStyle]}>Feels Like {Math.round(props.route.params.forecast.main.feels_like)}&deg;F</Text>
+                    <Text style={[styles.minMaxText, styles.textStyle]}>Humidity {props.route.params.forecast.main.humidity}</Text>
+                    <Text style={[styles.minMaxText, styles.textStyle]}>Wind Speed {props.route.params.forecast.wind.speed}</Text>
+                    <Text style={[styles.minMaxText, styles.textStyle]}>Direction Deg {props.route.params.forecast.wind.deg}</Text>
                     <Button
                     title="Home"
-                    onPress={() => navigation.props.navigate('Home')}
+                    onPress={() => props.navigation.navigate('Home')}
                     />
                 </View>
             </View>
@@ -38,8 +42,9 @@ function Details(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // alignItems: 'center',
-        // justifyContent: 'center',
+        // flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     detailsContainer: {
         backgroundColor: 'rgba(52, 52, 52, 0.4)',
@@ -54,6 +59,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
     },
     image: {
         flex: 1,
@@ -73,14 +79,26 @@ const styles = StyleSheet.create({
         marginTop: 20, 
     },
     currentTemp: {
-        fontSize: 32,
-        fontWeight: 'bold',
+        fontSize: 30,
+        // fontWeight: 'bold',
         textAlign: 'center',
     },
     textStyle: {
         textAlign: 'center',
         fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto',
         color: 'white',
+    },
+    minMaxContainer: {
+        width: '70%',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        margin: 20,
+        // border: '2px solid red',
+
+    },
+    minMaxText: {
+        fontSize: 18,
     },
     largeIcon: {
         fontSize: 50,
