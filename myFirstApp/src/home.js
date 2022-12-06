@@ -13,7 +13,7 @@ import getImageForWeather from '../utils/getImageForWeather';
 import getIconForWeather from '../utils/getIconForWeather';
 // api key
 
-import { OPEN_WEATHER_API } from '@env';
+// import { OPEN_WEATHER_API } from '@env';
 
 
 
@@ -27,14 +27,10 @@ function Home(props){
         <StatusBar style={styles.status} animated={true} barStyle='light-content'/>
         <View style={styles.currentContainer}>
           <View style={styles.currentTempContainer}>
-            <Text style={styles.title}>Seattle</Text>
+            <Text style={styles.title}>{props.route.params.forecast.name}</Text>
             <Text style={[styles.largeIcon, styles.textStyle]}>{getIconForWeather(props.route.params.weather)}</Text>
-            <Text style={[styles.currentTemp, styles.textStyle]}>38 F</Text>
-            <Text style={[styles.currentTemp, styles.textStyle]}>Rain</Text>
-            {/* <Text style={styles.title}>{forecast.name}</Text>
-            <Text style={[styles.largeIcon, styles.textStyle]}>{getIconForWeather(weather)}</Text>
-            <Text style={[styles.currentTemp, styles.textStyle]}>{Math.round(forecast.main.temp)}F</Text>
-            <Text style={[styles.currentTemp, styles.textStyle]}>{current.main}</Text> */}
+            <Text style={[styles.currentTemp, styles.textStyle]}>{Math.round(props.route.params.forecast.main.temp)}&deg;F</Text>
+            <Text style={[styles.currentTemp, styles.textStyle]}>{props.route.params.weather.description}</Text>
           </View>
           <View style={styles.buttonContainer}>
             <Button
